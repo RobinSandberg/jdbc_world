@@ -17,7 +17,7 @@ public class App
         CityDaoJDBC test = new CityDaoJDBC();
 
         System.out.println(test.findByID(5));
-        System.out.println(test.findByName("am"));
+        System.out.println(test.findByName("amster"));
         System.out.println(test.findByCode("swe"));
 
     }

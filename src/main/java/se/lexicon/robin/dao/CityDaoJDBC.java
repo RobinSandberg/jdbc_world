@@ -16,6 +16,7 @@ public class CityDaoJDBC implements CityDao{
     private static String findByNameString = "SELECT * FROM city WHERE name LIKE ?";
     private static String findByCodeString = "SELECT * FROM city WHERE countryCode LIKE ?";
 
+    @Override
     public City findByID(int id){
         City city = null;
         try (Connection connection = getConnection();PreparedStatement findById = connection.prepareStatement(findByIdString)) {
@@ -31,6 +32,7 @@ public class CityDaoJDBC implements CityDao{
         return city;
     }
 
+    @Override
     public List<City> findByCode(String code){
         List<City> foundCitiesByCode = new ArrayList<>();
         try (Connection connection = getConnection();PreparedStatement findByCode = connection.prepareStatement(findByCodeString)){
@@ -46,6 +48,7 @@ public class CityDaoJDBC implements CityDao{
         return foundCitiesByCode;
     }
 
+    @Override
     public List<City> findByName(String name){
         List<City> foundCitiesByName = new ArrayList<>();
         try (Connection connection = getConnection();PreparedStatement findByName = connection.prepareStatement(findByNameString)){
@@ -61,6 +64,7 @@ public class CityDaoJDBC implements CityDao{
         return foundCitiesByName;
     }
 
+    @Override
     public List<City> findAll(){
         List<City> allCities = new ArrayList<>();
         String findAllCities = "SELECT * FROM city";
@@ -76,6 +80,7 @@ public class CityDaoJDBC implements CityDao{
         return allCities;
     }
 
+    @Override
     public City add(City city){
       /*  if(!cities.contains(city)){
             cities.add(city);
@@ -84,10 +89,12 @@ public class CityDaoJDBC implements CityDao{
         return null;
     }
 
+    @Override
     public City update(City city){
         return null;
     }
 
+    @Override
     public City delete(City city){
         return null;
     }
