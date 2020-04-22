@@ -9,6 +9,13 @@ public class City {
     private String district;
     private int population;
 
+    public City(String name, String countryCode , String district, int population ){
+        this.name = name;
+        this.countryCode = countryCode;
+        this.district = district;
+        this.population = population;
+    }
+
     public City(int id,String name, String countryCode , String district, int population ){
      this.id = id;
      this.name = name;
@@ -21,9 +28,7 @@ public class City {
         return id;
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
     public String getCountryCode() {
         return countryCode;
@@ -35,6 +40,23 @@ public class City {
 
     public int getPopulation() {
         return population;
+    }
+
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public void setPopulation(int population) {
+        this.population = population;
     }
 
     @Override
@@ -56,12 +78,10 @@ public class City {
 
     @Override
     public String toString() {
-        return "City{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", countryCode='" + countryCode + '\'' +
-                ", district='" + district + '\'' +
-                ", population=" + population +
-                '}';
+        return "City Id: " + id +
+                " , Name: " + name +
+                " , Country Code: " + countryCode +
+                " , District: " + district +
+                " , Population: " + population;
     }
 }

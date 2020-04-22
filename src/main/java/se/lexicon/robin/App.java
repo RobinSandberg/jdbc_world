@@ -14,11 +14,13 @@ public class App
     public static void main( String[] args )
     {
 
-        CityDaoJDBC test = new CityDaoJDBC();
+        CityDaoJDBC cityDao = new CityDaoJDBC();
 
-        System.out.println(test.findByID(5));
-        System.out.println(test.findByName("amster"));
-        System.out.println(test.findByCode("swe"));
+        System.out.println(cityDao.findByID(5));
+        cityDao.findByName("amster").forEach(System.out::println);
+        cityDao.findByCode("swe").forEach(System.out::println);
+        City city = new City("Rottne", "SWE", "Småland", 3000);
+        cityDao.add(city);
 
     }
 }

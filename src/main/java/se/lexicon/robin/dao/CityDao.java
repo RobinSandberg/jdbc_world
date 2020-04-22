@@ -11,5 +11,5 @@ public interface CityDao {
     List<City> findAll();
     City add(City city);
     City update(City city);
-    City delete(City city);
+    int delete(City city);
 }

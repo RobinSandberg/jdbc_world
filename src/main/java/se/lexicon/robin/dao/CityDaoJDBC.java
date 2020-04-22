@@ -12,22 +12,35 @@ import java.util.Properties;
 
 public class CityDaoJDBC implements CityDao{
 
-    private static String findByIdString = "SELECT * FROM city WHERE id = ?";
-    private static String findByNameString = "SELECT * FROM city WHERE name LIKE ?";
-    private static String findByCodeString = "SELECT * FROM city WHERE countryCode LIKE ?";
+    private static final String FIND_ALL_STRING = "SELECT * FROM city";
+    private static final String FIND_BY_ID_STRING = "SELECT * FROM city WHERE id = ?";
+    private static final String FIND_BY_NAME_STRING = "SELECT * FROM city WHERE name LIKE ?";
+    private static final String FIND_BY_CODE_STRING = "SELECT * FROM city WHERE countryCode LIKE ?";
+    private static final String CREATE_CITY_STRING = "INSERT INTO city (name, CountryCode,District,Population) VALUES (?,?,?,?)";
+    private static final String UPDATE_CITY_STRING = "UPDATE city SET name = ? , countryCode = ? , district = ? , population = ? WHERE id = ?";
+    private static final String DELETE_CITY_STRING = "DELETE FROM city WHERE id = ?";
+    private static ResultSet resultSet = null;
 
     @Override
     public City findByID(int id){
         City city = null;
-        try (Connection connection = getConnection();PreparedStatement findById = connection.prepareStatement(findByIdString)) {
+        try (Connection connection = getConnection();PreparedStatement findById = connection.prepareStatement(FIND_BY_ID_STRING)) {
             findById.setInt(1, id);
-            ResultSet rs = findById.executeQuery();
-            while(rs.next()){
-                city = new City(rs.getInt("ID"),rs.getString("Name"),rs.getString("CountryCode"),
-                        rs.getString("District"),rs.getInt("Population"));
+            resultSet = findById.executeQuery();
+            while(resultSet.next()){
+                city = new City(resultSet.getInt("ID"),resultSet.getString("Name"),resultSet.getString("CountryCode"),
+                        resultSet.getString("District"),resultSet.getInt("Population"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }finally {
+            try{
+                if(resultSet != null){
+                    resultSet.close();
+                }
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
         }
         return city;
     }
@@ -35,15 +48,23 @@ public class CityDaoJDBC implements CityDao{
     @Override
     public List<City> findByCode(String code){
         List<City> foundCitiesByCode = new ArrayList<>();
-        try (Connection connection = getConnection();PreparedStatement findByCode = connection.prepareStatement(findByCodeString)){
+        try (Connection connection = getConnection();PreparedStatement findByCode = connection.prepareStatement(FIND_BY_CODE_STRING)){
             findByCode.setString(1, code+"%");
-            ResultSet rs = findByCode.executeQuery();
-            while(rs.next()){
-                foundCitiesByCode.add(new City(rs.getInt("ID"),rs.getString("Name"),rs.getString("CountryCode"),
-                        rs.getString("District"),rs.getInt("Population")));
+            resultSet = findByCode.executeQuery();
+            while(resultSet.next()){
+                foundCitiesByCode.add(new City(resultSet.getInt("ID"),resultSet.getString("Name"),resultSet.getString("CountryCode"),
+                        resultSet.getString("District"),resultSet.getInt("Population")));
             }
         }catch(SQLException e){
             e.printStackTrace();
+        }finally {
+            try{
+                if(resultSet != null){
+                    resultSet.close();
+                }
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
         }
         return foundCitiesByCode;
     }
@@ -51,15 +72,23 @@ public class CityDaoJDBC implements CityDao{
     @Override
     public List<City> findByName(String name){
         List<City> foundCitiesByName = new ArrayList<>();
-        try (Connection connection = getConnection();PreparedStatement findByName = connection.prepareStatement(findByNameString)){
+        try (Connection connection = getConnection();PreparedStatement findByName = connection.prepareStatement(FIND_BY_NAME_STRING)){
             findByName.setString(1,name+"%");
-            ResultSet rs = findByName.executeQuery();
-            while(rs.next()){
-                foundCitiesByName.add(new City(rs.getInt("ID"),rs.getString("Name"),rs.getString("CountryCode"),
-                        rs.getString("District"),rs.getInt("Population")));
+            resultSet = findByName.executeQuery();
+            while(resultSet.next()){
+                foundCitiesByName.add(new City(resultSet.getInt("ID"),resultSet.getString("Name"),resultSet.getString("CountryCode"),
+                        resultSet.getString("District"),resultSet.getInt("Population")));
             }
         }catch(SQLException e){
             e.printStackTrace();
+        }finally {
+            try{
+                if(resultSet != null){
+                    resultSet.close();
+                }
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
         }
         return foundCitiesByName;
     }
@@ -67,36 +96,89 @@ public class CityDaoJDBC implements CityDao{
     @Override
     public List<City> findAll(){
         List<City> allCities = new ArrayList<>();
-        String findAllCities = "SELECT * FROM city";
         try  (Connection connection = getConnection(); Statement statement = connection.createStatement()){
-           ResultSet rs = statement.executeQuery(findAllCities);
-           while (rs.next()){
-               allCities.add(new City(rs.getInt("ID"),rs.getString("Name"),rs.getString("CountryCode"),
-                       rs.getString("District"),rs.getInt("Population")));
+           resultSet = statement.executeQuery(FIND_ALL_STRING);
+           while (resultSet.next()){
+               allCities.add(new City(resultSet.getInt("ID"),resultSet.getString("Name"),resultSet.getString("CountryCode"),
+                       resultSet.getString("District"),resultSet.getInt("Population")));
            }
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            try{
+                if(resultSet != null){
+                    resultSet.close();
+                }
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
         }
         return allCities;
     }
 
     @Override
     public City add(City city){
-      /*  if(!cities.contains(city)){
-            cities.add(city);
-            return city;
-        }*/
-        return null;
+        try (Connection connection = getConnection();PreparedStatement createCity = connection.prepareStatement(CREATE_CITY_STRING)){
+            createCity.setString(1,city.getName());
+            createCity.setString(2,city.getCountryCode());
+            createCity.setString(3,city.getDistrict());
+            createCity.setInt(4,city.getPopulation());
+            createCity.executeUpdate();
+        }catch(SQLException e){
+            e.printStackTrace();
+        }finally {
+            try{
+                if(resultSet != null){
+                    resultSet.close();
+                }
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
+        }
+        return city;
     }
 
     @Override
     public City update(City city){
-        return null;
+        try (Connection connection = getConnection();PreparedStatement updateCity = connection.prepareStatement(UPDATE_CITY_STRING)){
+            updateCity.setString(1,city.getName());
+            updateCity.setString(2,city.getCountryCode());
+            updateCity.setString(3,city.getDistrict());
+            updateCity.setInt(4,city.getPopulation());
+            updateCity.setInt(5,city.getId());
+            updateCity.executeUpdate();
+        }catch(SQLException e){
+            e.printStackTrace();
+        }finally {
+            try{
+                if(resultSet != null){
+                    resultSet.close();
+                }
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
+        }
+        return city;
     }
 
     @Override
-    public City delete(City city){
-        return null;
+    public int delete(City city){
+        int rowsAffected = 0;
+        try (Connection connection = getConnection();PreparedStatement deleteByID = connection.prepareStatement(DELETE_CITY_STRING)){
+            deleteByID.setInt(1,city.getId());
+            rowsAffected = deleteByID.executeUpdate();
+        }catch(SQLException e){
+            e.printStackTrace();
+        }finally {
+            try{
+                if(resultSet != null){
+                    resultSet.close();
+                }
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
+        }
+        return rowsAffected;
     }
 
     public static Connection getConnection() throws SQLException {
