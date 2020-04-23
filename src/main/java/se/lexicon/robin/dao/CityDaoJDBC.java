@@ -235,6 +235,6 @@ public class CityDaoJDBC implements CityDao{
         }catch(IOException e){
             e.printStackTrace();
         }
-        return DriverManager.getConnection(host,login,password);
+        return DriverManager.getConnection(host, login, password);
     }
 }

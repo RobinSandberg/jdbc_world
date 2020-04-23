@@ -1,7 +1,5 @@
 package se.lexicon.robin.dao;
 
-import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import se.lexicon.robin.model.City;
@@ -17,7 +15,7 @@ public class CityDaoJDBCTest {
     private List<City> foundCities;
     private City testCity;
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         cityDao = new CityDaoJDBC();
         foundCities = new ArrayList<>();
         testCity = new City(3056,"Helsingborg", "SWE","SkÃ¥ne lÃ¤n", 117737);
