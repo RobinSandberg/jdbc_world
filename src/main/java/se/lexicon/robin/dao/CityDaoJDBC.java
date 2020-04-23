@@ -72,8 +72,8 @@ public class CityDaoJDBC implements CityDao{
     @Override
     public List<City> findByName(String name){
         List<City> foundCitiesByName = new ArrayList<>();
-        try (Connection connection = getConnection();PreparedStatement findByName = connection.prepareStatement(FIND_BY_NAME_STRING)){
-            findByName.setString(1,name+"%");
+            try (Connection connection = getConnection();PreparedStatement findByName = connection.prepareStatement(FIND_BY_NAME_STRING)){
+                findByName.setString(1,name+"%");
             resultSet = findByName.executeQuery();
             while(resultSet.next()){
                 foundCitiesByName.add(new City(resultSet.getInt("ID"),resultSet.getString("Name"),resultSet.getString("CountryCode"),
@@ -118,12 +118,26 @@ public class CityDaoJDBC implements CityDao{
 
     @Override
     public City add(City city){
-        try (Connection connection = getConnection();PreparedStatement createCity = connection.prepareStatement(CREATE_CITY_STRING)){
-            createCity.setString(1,city.getName());
-            createCity.setString(2,city.getCountryCode());
-            createCity.setString(3,city.getDistrict());
-            createCity.setInt(4,city.getPopulation());
-            createCity.executeUpdate();
+        City foundCity = null;
+        City addedCity = null;
+        try (Connection connection = getConnection();PreparedStatement createCity = connection.prepareStatement(CREATE_CITY_STRING);
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM city WHERE name LIKE ?")){
+            statement.setString(1,city.getName());
+            resultSet = statement.executeQuery();
+            while(resultSet.next()){
+                foundCity = new City(resultSet.getInt("ID"),resultSet.getString("Name"),resultSet.getString("CountryCode"),
+                        resultSet.getString("District"),resultSet.getInt("Population"));
+            }
+            if(foundCity == null) {
+                createCity.setString(1, city.getName());
+                createCity.setString(2, city.getCountryCode());
+                createCity.setString(3, city.getDistrict());
+                createCity.setInt(4, city.getPopulation());
+                createCity.executeUpdate();
+                addedCity = findCityByName(city.getName());
+            }else{
+                System.out.println("City already exist");
+            }
         }catch(SQLException e){
             e.printStackTrace();
         }finally {
@@ -135,11 +149,36 @@ public class CityDaoJDBC implements CityDao{
                 e.printStackTrace();
             }
         }
-        return city;
+
+        return addedCity;
+    }
+
+    public City findCityByName(String name){
+        City foundCity = null;
+        try (Connection connection = getConnection();PreparedStatement findByName = connection.prepareStatement(FIND_BY_NAME_STRING)){
+            findByName.setString(1,name);
+            resultSet = findByName.executeQuery();
+            while(resultSet.next()){
+                foundCity = new City(resultSet.getInt("ID"),resultSet.getString("Name"),resultSet.getString("CountryCode"),
+                        resultSet.getString("District"),resultSet.getInt("Population"));
+            }
+        }catch(SQLException e){
+            e.printStackTrace();
+        }finally {
+            try{
+                if(resultSet != null){
+                    resultSet.close();
+                }
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
+        }
+        return foundCity;
     }
 
     @Override
     public City update(City city){
+        City  updatedCity = null;
         try (Connection connection = getConnection();PreparedStatement updateCity = connection.prepareStatement(UPDATE_CITY_STRING)){
             updateCity.setString(1,city.getName());
             updateCity.setString(2,city.getCountryCode());
@@ -147,6 +186,7 @@ public class CityDaoJDBC implements CityDao{
             updateCity.setInt(4,city.getPopulation());
             updateCity.setInt(5,city.getId());
             updateCity.executeUpdate();
+            updatedCity = findByID(city.getId());
         }catch(SQLException e){
             e.printStackTrace();
         }finally {
@@ -158,7 +198,7 @@ public class CityDaoJDBC implements CityDao{
                 e.printStackTrace();
             }
         }
-        return city;
+        return updatedCity;
     }
 
     @Override
