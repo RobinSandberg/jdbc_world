@@ -189,14 +189,6 @@ public class CityDaoJDBC implements CityDao{
             updatedCity = findByID(city.getId());
         }catch(SQLException e){
             e.printStackTrace();
-        }finally {
-            try{
-                if(resultSet != null){
-                    resultSet.close();
-                }
-            }catch (SQLException e){
-                e.printStackTrace();
-            }
         }
         return updatedCity;
     }
@@ -209,14 +201,6 @@ public class CityDaoJDBC implements CityDao{
             rowsAffected = deleteByID.executeUpdate();
         }catch(SQLException e){
             e.printStackTrace();
-        }finally {
-            try{
-                if(resultSet != null){
-                    resultSet.close();
-                }
-            }catch (SQLException e){
-                e.printStackTrace();
-            }
         }
         return rowsAffected;
     }
