@@ -121,7 +121,7 @@ public class CityDaoJDBC implements CityDao{
         City foundCity = null;
         City addedCity = null;
         try (Connection connection = getConnection();PreparedStatement createCity = connection.prepareStatement(CREATE_CITY_STRING);
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM city WHERE name LIKE ?")){
+             PreparedStatement statement = connection.prepareStatement(FIND_BY_NAME_STRING)){
             statement.setString(1,city.getName());
             resultSet = statement.executeQuery();
             while(resultSet.next()){
