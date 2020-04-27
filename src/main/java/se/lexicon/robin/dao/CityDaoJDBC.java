@@ -118,16 +118,9 @@ public class CityDaoJDBC implements CityDao{
 
     @Override
     public City add(City city){
-        City foundCity = null;
         City addedCity = null;
-        try (Connection connection = getConnection();PreparedStatement createCity = connection.prepareStatement(CREATE_CITY_STRING);
-             PreparedStatement statement = connection.prepareStatement(FIND_BY_NAME_STRING)){
-            statement.setString(1,city.getName());
-            resultSet = statement.executeQuery();
-            while(resultSet.next()){
-                foundCity = new City(resultSet.getInt("ID"),resultSet.getString("Name"),resultSet.getString("CountryCode"),
-                        resultSet.getString("District"),resultSet.getInt("Population"));
-            }
+        try (Connection connection = getConnection();PreparedStatement createCity = connection.prepareStatement(CREATE_CITY_STRING)){
+            City foundCity = findCityByName(city.getName());
             if(foundCity == null) {
                 createCity.setString(1, city.getName());
                 createCity.setString(2, city.getCountryCode());
@@ -178,7 +171,6 @@ public class CityDaoJDBC implements CityDao{
 
     @Override
     public City update(City city){
-        City  updatedCity = null;
         try (Connection connection = getConnection();PreparedStatement updateCity = connection.prepareStatement(UPDATE_CITY_STRING)){
             updateCity.setString(1,city.getName());
             updateCity.setString(2,city.getCountryCode());
@@ -186,11 +178,10 @@ public class CityDaoJDBC implements CityDao{
             updateCity.setInt(4,city.getPopulation());
             updateCity.setInt(5,city.getId());
             updateCity.executeUpdate();
-            updatedCity = findByID(city.getId());
         }catch(SQLException e){
             e.printStackTrace();
         }
-        return updatedCity;
+        return findByID(city.getId());
     }
 
     @Override
